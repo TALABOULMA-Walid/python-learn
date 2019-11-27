@@ -1,5 +1,5 @@
 import socket
-import threading
+import _thread
 import select
 
 __version__ = '0.1.0 Draft 1'
@@ -13,13 +13,12 @@ class ConnectionHandler:
 
     def __init__(self, connection, timeout):
         self.client = connection
-        self.client_buffer = ''
         self.timeout = timeout
+        self.client_buffer = ''
         self.method, self.path, self.protocol = self.get_base_header()
         if self.method == 'CONNECT':
             self.method_connect()
-        elif self.method in ('OPTIONS', 'GET', 'HEAD', 'POST', 'PUT',
-                             'DELETE', 'TRACE'):
+        elif self.method in ('OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE'):
             self.method_others()
         self.client.close()
         self.target.close()
@@ -30,15 +29,17 @@ class ConnectionHandler:
             end = self.client_buffer.find('\n')
             if end != -1:
                 break
-        print('%s' % self.client_buffer[:end])
+        print('{client_buffer'.format(client_buffer=self.client_buffer[:end]))
         data = (self.client_buffer[:end+1]).split()
         self.client_buffer = self.client_buffer[end+1:]
         return data
 
     def method_connect(self):
         self._connect_target(self.path)
-        self.client.send(HTTP_VERSION+' 200 Connection established\n'+
-                         'Proxy-agent: %s\n\n'%VERSION)
+        self.client.send("{http_version} 200 Connection established\nProxy-agent: {version}\n\n".format(
+            http_version=HTTP_VERSION,
+            version=VERSION
+        ))
         self.client_buffer = ''
         self._read_write()
 
@@ -48,7 +49,12 @@ class ConnectionHandler:
         host = self.path[:i]
         path = self.path[i:]
         self._connect_target(host)
-        self.target.send('%s %s %s\n' % (self.method, path, self.protocol) + self.client_buffer)
+        self.target.send("{method} {path} {protocol}\n{client_buffer}".format(
+            method=self.method,
+            path=path,
+            protocol=self.protocol,
+            client_buffer=self.client_buffer).encode("UTF-8")
+                         )
         self.client_buffer = ''
         self._read_write()
 
@@ -95,11 +101,10 @@ def start_server(host='localhost', port=8080,
         soc_type = socket.AF_INET
     soc = socket.socket(soc_type)
     soc.bind((host, port))
-    print("Serving on %s:%d."%(host, port))
+    print("Serving on {host}:{port}.".format(host=host, port=port))
     soc.listen(0)
     while 1:
-        pass
-# threading._start_new_thread(handler, soc.accept()+(timeout,))
+        _thread.start_new_thread(handler, (soc.accept()[0], timeout))
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-import socket, thread, select
+import socket, _thread, select
 
 __version__ = '0.1.0 Draft 1'
 BUFLEN = 8192
@@ -25,7 +25,7 @@ class ConnectionHandler:
             end = self.client_buffer.find('\n')
             if end!=-1:
                 break
-        print '%s'%self.client_buffer[:end]#debug
+        #print '%s'%self.client_buffer[:end]#debug
         data = (self.client_buffer[:end+1]).split()
         self.client_buffer = self.client_buffer[end+1:]
         return data
@@ -89,10 +89,10 @@ def start_server(host='localhost', port=8080, IPv6=False, timeout=60,
         soc_type=socket.AF_INET
     soc = socket.socket(soc_type)
     soc.bind((host, port))
-    print "Serving on %s:%d."%(host, port)#debug
+    # print "Serving on %s:%d."%(host, port)#debug
     soc.listen(0)
     while 1:
-        thread.start_new_thread(handler, soc.accept()+(timeout,))
+        _thread.start_new_thread(handler, soc.accept()+(timeout,))
 
 if __name__ == '__main__':
     start_server()
