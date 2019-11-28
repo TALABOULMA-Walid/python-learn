@@ -9,10 +9,11 @@ HTTP_VERSION = 'HTTP/1.1'
 
 
 class ConnectionHandler:
-    """ Docstring """
+    """Handles connections between the HTTP client and HTTP server."""
 
     def __init__(self, connection, timeout):
         self.client = connection
+        self.target = None
         self.timeout = timeout
         self.client_buffer = ''
         self.method, self.path, self.protocol = self.get_base_header()
@@ -24,17 +25,19 @@ class ConnectionHandler:
         self.target.close()
 
     def get_base_header(self):
+        """Return a tuple of (method, path, protocol) from the received message."""
         while 1:
-            self.client_buffer += self.client.recv(BUFFER_LEN)
+            self.client_buffer += self.client.recv(BUFFER_LEN).decode('UTF-8')
             end = self.client_buffer.find('\n')
             if end != -1:
                 break
-        print('{client_buffer'.format(client_buffer=self.client_buffer[:end]))
+        print('{client_buffer}'.format(client_buffer=self.client_buffer[:end]))
         data = (self.client_buffer[:end+1]).split()
         self.client_buffer = self.client_buffer[end+1:]
         return data
 
     def method_connect(self):
+        """Handles HTTP CONNECT messages."""
         self._connect_target(self.path)
         self.client.send("{http_version} 200 Connection established\nProxy-agent: {version}\n\n".format(
             http_version=HTTP_VERSION,
@@ -44,6 +47,7 @@ class ConnectionHandler:
         self._read_write()
 
     def method_others(self):
+        """Handles HTTP non-CONNECT messages."""
         self.path = self.path[7:]
         i = self.path.find('/')
         host = self.path[:i]
@@ -59,8 +63,9 @@ class ConnectionHandler:
         self._read_write()
 
     def _connect_target(self, host):
+        """Create a connection to the HTTP server specified by *host*."""
         i = host.find(':')
-        if i!=-1:
+        if i != -1:
             port = int(host[i+1:])
             host = host[:i]
         else:
@@ -70,6 +75,7 @@ class ConnectionHandler:
         self.target.connect(address)
 
     def _read_write(self):
+        """Read data from client connection and forward to server connection."""
         time_out_max = self.timeout/3
         socs = [self.client, self.target]
         count = 0
@@ -92,8 +98,7 @@ class ConnectionHandler:
                 break
 
 
-def start_server(host='localhost', port=8080,
-                 ipv6=False, timeout=60,
+def start_server(host='localhost', port=8081, ipv6=False, timeout=60,
                  handler=ConnectionHandler):
     if ipv6:
         soc_type = socket.AF_INET6
@@ -104,7 +109,8 @@ def start_server(host='localhost', port=8080,
     print("Serving on {host}:{port}.".format(host=host, port=port))
     soc.listen(0)
     while 1:
-        _thread.start_new_thread(handler, (soc.accept()[0], timeout))
+        connection = soc.accept()[0]
+        _thread.start_new_thread(handler, (connection, timeout))
 
 
 if __name__ == '__main__':
