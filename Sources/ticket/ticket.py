@@ -29,10 +29,10 @@
 # let { value: chunk, done: readerDone } = await reader.read();
 # chunk = new TextDecoder('utf-8').decode(chunk);
 # document.getElementsByTagName('body')[0].innerText = chunk; }
-
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for
 from pprint import pprint
+
 app = Flask(__name__)
 INSERT_STATEMENT = """INSERT INTO Tickets('change','title','description',
                     'submitter_name','submitter_email','submitter_website','file')
@@ -59,15 +59,7 @@ def add_ticket():
         db_connection = sqlite3.connect('ticket.db.sqlite3')
         cursor = db_connection.cursor()
         pprint(request.form)
-        cursor.execute(INSERT_STATEMENT.format(
-            change=request.form.get('change'),
-            title=request.form.get('title'),
-            description=request.form.get('description'),
-            submitter_name=request.form.get('submitter_name'),
-            submitter_email=request.form.get('submitter_email'),
-            submitter_website=request.form.get('submitter_website'),
-            file=request.form.get('file')
-        ))
+        cursor.execute(INSERT_STATEMENT.format(**request.form))
         db_connection.commit()
         return redirect(url_for('list_tickets'))
 
@@ -75,7 +67,11 @@ def add_ticket():
 @app.route('/ticket/id/<int:ticket_id>')
 def view_ticket(ticket_id):
     """Display the details of the ticket with id *ticket_id*."""
-    return 'view_ticket : id = {}'.format(ticket_id)
+    db_connection = sqlite3.connect('ticket.db.sqlite3')
+    cursor = db_connection.cursor()
+    cursor.execute('SELECT * FROM Tickets WHERE id={}'.format(ticket_id))
+    ticket = cursor.fetchone()
+    return render_template('detail.html', ticket=ticket)
 
 
 if __name__ == '__main__':

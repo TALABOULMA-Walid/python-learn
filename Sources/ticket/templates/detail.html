@@ -1,0 +1,9 @@
+{% extends 'index.html' %}
+{% block content %}
+<h1>{{ ticket.2 }}</h1>
+<ul>
+    {% for field in ticket %}
+    <li>{{ field }}</li>
+    {% endfor %}
+</ul>
+{% endblock content %}
