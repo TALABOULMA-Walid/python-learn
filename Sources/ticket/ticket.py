@@ -23,7 +23,7 @@
 #    );
 
 import sqlite3
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
@@ -31,7 +31,13 @@ app = Flask(__name__)
 @app.route('/', methods=['GET'])
 def list_tickets():
     """Display a list of tickets in the system."""
-    return 'list_tickets'
+    db_connection = sqlite3.connect('ticket.db.sqlite3')
+    cursor = db_connection.cursor()
+    cursor.execute('SELECT * FROM Tickets')
+    tickets = cursor.fetchall()
+    return render_template('index.html', tickets=tickets)
+
+
 
 
 @app.route('/ticket', methods=['GET', 'POST'])
