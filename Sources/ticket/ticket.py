@@ -21,9 +21,17 @@
 #    file TEXT NULL,
 #    date_created DATE NOT NULL,
 #    );
+#
+# JAVASCRIPT to POST request and update page
+# async function update_POST(){
+# resp = await fetch('/ticket', {method: 'POST'});
+# reader = resp.body.getReader();
+# let { value: chunk, done: readerDone } = await reader.read();
+# chunk = new TextDecoder('utf-8').decode(chunk);
+# document.getElementsByTagName('body')[0].innerText = chunk; }
 
 import sqlite3
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -38,12 +46,14 @@ def list_tickets():
     return render_template('index.html', tickets=tickets)
 
 
-
-
 @app.route('/ticket', methods=['GET', 'POST'])
 def add_ticket():
     """Add a new ticket via a form."""
-    return 'add_ticket'
+    if request.method == 'GET':
+        return render_template('edit.html')
+    elif request.method == 'POST':
+        print(request.__dict__)
+        return 'add_ticket : process_form()'
 
 
 @app.route('/ticket/id/<int:ticket_id>')

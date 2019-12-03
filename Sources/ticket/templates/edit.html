@@ -1,0 +1,45 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="col-md-4 offset-md-4">
+    <form action="{{ url_for('add_ticket')}}" method="POST">
+        <legend>Create a ticket</legend>
+        <div class="form-group">
+            <label for="id">Change ID</label>
+            <input type="number" class="form-control" id="id">
+        </div>
+        <div class="form-group">
+            <label for="change">Change Type</label>
+            <input type="text" class="form-control" id="change">
+        </div>
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="submitter_name">Submitter Name</label>
+            <input type="text" class="form-control" id="submitter_name">
+        </div>
+        <div class="form-group">
+            <label for="submitter_email">Submitter Email</label>
+            <input type="text" class="form-control" id="submitter_email">
+        </div>
+        <div class="form-group">
+            <label for="submitter_website">Submitter Website</label>
+            <input type="text" class="form-control" id="submitter_website">
+        </div>
+        <div class="form-group">
+            <label for="file">File</label>
+            <input type="text" class="form-control" id="file">
+        </div>
+        <div class="form-group">
+            <label for="date_created">Date Created</label>
+            <input type="date" class="form-control" id="date_created">
+        </div>
+        <input type="submit" class="btn btn-primary" value="Create Ticket">
+    </form>
+</div>
+{% endblock content %}
