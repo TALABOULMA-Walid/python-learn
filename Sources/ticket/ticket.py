@@ -31,9 +31,13 @@
 # document.getElementsByTagName('body')[0].innerText = chunk; }
 
 import sqlite3
-from flask import Flask, render_template, request
-
+from flask import Flask, render_template, request, redirect, url_for
+from pprint import pprint
 app = Flask(__name__)
+INSERT_STATEMENT = """INSERT INTO Tickets('change','title','description',
+                    'submitter_name','submitter_email','submitter_website','file')
+                     VALUES ("{change}","{title}","{description}",
+                     "{submitter_name}","{submitter_email}","{submitter_website}","{file}");"""
 
 
 @app.route('/', methods=['GET'])
@@ -51,9 +55,21 @@ def add_ticket():
     """Add a new ticket via a form."""
     if request.method == 'GET':
         return render_template('edit.html')
-    elif request.method == 'POST':
-        print(request.__dict__)
-        return 'add_ticket : process_form()'
+    else:
+        db_connection = sqlite3.connect('ticket.db.sqlite3')
+        cursor = db_connection.cursor()
+        pprint(request.form)
+        cursor.execute(INSERT_STATEMENT.format(
+            change=request.form.get('change'),
+            title=request.form.get('title'),
+            description=request.form.get('description'),
+            submitter_name=request.form.get('submitter_name'),
+            submitter_email=request.form.get('submitter_email'),
+            submitter_website=request.form.get('submitter_website'),
+            file=request.form.get('file')
+        ))
+        db_connection.commit()
+        return redirect(url_for('list_tickets'))
 
 
 @app.route('/ticket/id/<int:ticket_id>')
