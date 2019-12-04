@@ -1,0 +1,33 @@
+# Ticket
+# -------------------------
+# Id : Int Primary Key
+# Type of change : String
+# Title : String
+# Description : String
+# Submitter Name : String
+# Submitter email : String
+# Submitter website : String
+# File : File
+# Date Created : Date
+# -------------------------
+# CREATE TABLE Ticket (
+#    id INT PRIMARY KEY,
+#    change TEXT NOT NULL,
+#    title TEXT NOT NULL,
+#    description TEXT NULL,
+#    submitter_name TEXT NOT NULL,
+#    submitter_email TEXT NOT NULL,
+#    submitter_website TEXT NULL,
+#    file TEXT NULL,
+#    date_created DATE NOT NULL,
+#    );
+# -------------------------
+# JAVASCRIPT to POST request and update page
+# async function update_POST(){
+# resp = await fetch('/ticket', {method: 'POST'});
+# reader = resp.body.getReader();
+# let { value: chunk, done: readerDone } = await reader.read();
+# chunk = new TextDecoder('utf-8').decode(chunk);
+# document.getElementsByTagName('body')[0].innerText = chunk; }
+# -------------------------
+# improvement: use ORM for database "sqlalchemy"
