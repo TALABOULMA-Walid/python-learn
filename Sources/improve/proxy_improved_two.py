@@ -1,5 +1,4 @@
-"""An HTTP proxy that supports IPv6 as well as the HTTP CONNECT method, among
-other things."""
+"""An HTTP proxy that supports IPv6 as well as the HTTP CONNECT method, among other things."""
 
 # Standard library imports
 import socket
@@ -25,10 +24,9 @@ class Proxy(object):
             self.method_others(method, path, protocol)
 
     def get_base_header(self):
-        """Return a tuple of (method, path, protocol) from the recieved
-        message."""
+        """Return a tuple of (method, path, protocol) from the received message."""
         while '\n' not in self.client_buffer:
-            self.client_buffer += self.client.recv(BUFFER_LENGTH)
+            self.client_buffer += self.client.recv(BUFFER_LENGTH).decode("UTF-8")
         (data, _, self.client_buffer) = self.client_buffer.partition('\n')
         return data.split()
 
@@ -44,7 +42,8 @@ class Proxy(object):
 
     def method_others(self, method, path, protocol):
         """Handle all non-HTTP CONNECT messages."""
-        path = path[len('http://'):]
+        if "http://" in path:
+            _, path = path.split("http://", 1)
         host, _, path = path.partition('/')
         path = '/{}'.format(path)
         self._connect_to_target(host)
@@ -52,7 +51,7 @@ class Proxy(object):
             method=method,
             path=path,
             protocol=protocol,
-            client_buffer=self.client_buffer))
+            client_buffer=self.client_buffer).encode("UTF-8"))
         self.client_buffer = ''
         self._read_write()
 
@@ -66,8 +65,7 @@ class Proxy(object):
         self.target.connect(address)
 
     def _read_write(self):
-        """Read data from client connection and forward to server
-        connection."""
+        """Read data from client connection and forward to server connection."""
         sockets = [self.client, self.target]
         try:
             while 1:
@@ -92,7 +90,8 @@ class Proxy(object):
 def start_server():
     """Start the HTTP proxy server."""
     host = 'localhost'
-    port = 8080
+    import random
+    port = 8080 + random.randint(0, 10)
     listener = socket.socket(socket.AF_INET)
     listener.bind((host, port))
     print('Serving on {0}:{1}.'.format(host, port))
@@ -100,8 +99,7 @@ def start_server():
     while 1:
         connection, address = listener.accept()
         print('Got connection from {}'.format(address))
-        threading.Thread(
-            target=Proxy, args=(connection, )).run()
+        threading.Thread(target=Proxy, args=(connection, )).run()
 
 
 if __name__ == '__main__':
