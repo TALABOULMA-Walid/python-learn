@@ -1,23 +1,23 @@
 from urllib import request
-import xml.etree.ElementTree as ET
-import sys
-import os
+import xml.etree.ElementTree as Et
 
-urlbus="http://ctabustracker.com/bustime/map/getBusesForRoute.jsp?route=22"
-route22file="rt22.xml"
+
+BUS_URL = "http://ctabustracker.com/bustime/map/getBusesForRoute.jsp?route=22"
+route22file = "rt22.xml"
+
 
 def main():
-    u = request.urlopen(urlbus)
+    u = request.urlopen(BUS_URL)
     data = u.read()
-    f = open(route22file,'wb+')
+    f = open(route22file, 'wb+')
     f.write(data)
     f.flush()
     f.close()
 
-    tree = ET.parse("rt22.xml")
+    tree = Et.parse("rt22.xml")
     root = tree.getroot()
-    childs = (child for child in root if child.tag == 'bus')
-    for child in childs:
+    children = (child for child in root if child.tag == 'bus')
+    for child in children:
         print(child)
 
 
