@@ -1,9 +1,9 @@
 """An HTTP proxy that supports IPv6 as well as the HTTP CONNECT method, among
 other things."""
 
-# Standard libary imports
+# Standard library imports
 import socket
-import thread
+import _thread
 import select
 
 __version__ = '0.1.0 Draft 1'
@@ -33,7 +33,7 @@ class ConnectionHandler(object):
             end = self.client_buffer.find('\n')
             if end != -1:
                 break
-        print '{}'.format(self.client_buffer[:end])
+        print('{}'.format(self.client_buffer[:end]))
         data = (self.client_buffer[:end+1]).split()
         self.client_buffer = self.client_buffer[end+1:]
         return data
@@ -111,10 +111,10 @@ def start_server(host='localhost', port=8080, ipv_6=False, timeout=60,
         soc_type = socket.AF_INET
     soc = socket.socket(soc_type)
     soc.bind((host, port))
-    print 'Serving on {0}:{1}.'.format(host, port)
+    print('Serving on {0}:{1}.'.format(host, port))
     soc.listen(0)
     while 1:
-        thread.start_new_thread(handler, soc.accept()+(timeout,))
+        _thread.start_new_thread(handler, soc.accept()+(timeout,))
 
 if __name__ == '__main__':
     start_server()

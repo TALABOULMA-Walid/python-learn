@@ -1,7 +1,7 @@
 """An HTTP proxy that supports IPv6 as well as the HTTP CONNECT method, among
 other things."""
 
-# Standard libary imports
+# Standard library imports
 import socket
 import threading
 import select
@@ -95,13 +95,14 @@ def start_server():
     port = 8080
     listener = socket.socket(socket.AF_INET)
     listener.bind((host, port))
-    print 'Serving on {0}:{1}.'.format(host, port)
+    print('Serving on {0}:{1}.'.format(host, port))
     listener.listen(0)
     while 1:
         connection, address = listener.accept()
-        print 'Got connection from {}'.format(address)
+        print('Got connection from {}'.format(address))
         threading.Thread(
             target=Proxy, args=(connection, )).run()
+
 
 if __name__ == '__main__':
     start_server()
