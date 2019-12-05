@@ -42,7 +42,7 @@ class ConnectionHandler(object):
         self.client.send("{http_version} 200 Connection established\n"
                          "Proxy-agent: {version}\n\n".format(
                           http_version=HTTP_VERSION,
-                          version=VERSION))
+                          version=VERSION).encode("UTF-8"))
         self.client_buffer = ""
         self._read_write()
 
