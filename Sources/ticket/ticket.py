@@ -12,10 +12,10 @@ INSERT_STATEMENT = """INSERT INTO Tickets('change','title','description',
 @app.route('/', methods=['GET'])
 def list_tickets():
     """Display a list of tickets in the system."""
-    db_connection = sqlite3.connect('ticket.db.sqlite3')
-    cursor = db_connection.cursor()
-    cursor.execute('SELECT * FROM Tickets')
-    tickets = cursor.fetchall()
+    with sqlite3.connect('ticket.db.sqlite3') as db_connection:
+        cursor = db_connection.cursor()
+        cursor.execute('SELECT * FROM Tickets')
+        tickets = cursor.fetchall()
     return render_template('index.html', tickets=tickets)
 
 
@@ -25,22 +25,26 @@ def add_ticket():
     if request.method == 'GET':
         return render_template('edit.html')
     else:
-        db_connection = sqlite3.connect('ticket.db.sqlite3')
-        cursor = db_connection.cursor()
-        pprint(request.form)
-        cursor.execute(INSERT_STATEMENT.format(**request.form))
-        db_connection.commit()
+        with sqlite3.connect('ticket.db.sqlite3') as db_connection:
+            cursor = db_connection.cursor()
+            try:
+                cursor.execute(INSERT_STATEMENT.format(**request.form))
+            except:
+                return render_template('edit.html')
         return redirect(url_for('list_tickets'))
 
 
 @app.route('/ticket/id/<int:ticket_id>')
 def view_ticket(ticket_id):
     """Display the details of the ticket with id *ticket_id*."""
-    db_connection = sqlite3.connect('ticket.db.sqlite3')
-    cursor = db_connection.cursor()
-    cursor.execute('SELECT * FROM Tickets WHERE id={}'.format(ticket_id))
-    ticket = cursor.fetchone()
-    return render_template('detail.html', ticket=ticket)
+    with sqlite3.connect('ticket.db.sqlite3') as db_connection:
+        cursor = db_connection.cursor()
+        cursor.execute('SELECT * FROM Tickets WHERE id={}'.format(ticket_id))
+        ticket = cursor.fetchone()
+    if not ticket:
+        return redirect(url_for('list_tickets'))
+    else:
+        return render_template('detail.html', ticket=ticket)
 
 
 if __name__ == '__main__':
