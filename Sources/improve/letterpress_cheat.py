@@ -1,4 +1,6 @@
 # use python -m cProfile letterpress_cheat.py
+import pickle
+# use pickle.dump to save to a file, and pickle.load(file) to load afterward
 
 words_anagram_dict = {}
 words_anagrams = []
@@ -17,16 +19,16 @@ def create_anagram_dict():
 #       words_anagrams.sort()
 
 
-def save_anagram_dict():
-    with open("./anagrams.txt", "w") as anagram_file:
-        for anagram in words_anagram_dict:
-            anagram_file.write('{anagram} : {words} \n'.format(
-                anagram=anagram,
-                words=' '.join(words_anagram_dict[anagram]))
-            )
+#def save_anagram_dict():
+#    with open("./anagrams.txt", "w") as anagram_file:
+#        for anagram in words_anagram_dict:
+#            anagram_file.write('{anagram} : {words} \n'.format(
+#                anagram=anagram,
+#                words=' '.join(words_anagram_dict[anagram]))
+#            )
 
 
 if __name__ == '__main__':
     create_anagram_dict()
-    save_anagram_dict()
+
 
