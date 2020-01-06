@@ -25,8 +25,20 @@ def create_anagram_dict():
 def find_possible_words(anagrams, available_letters):
     """return an ordered list of all possible words that can be made with available letters"""
     found_words = []
-
-    return sorted(found_words, key=lambda x: len(x))
+    already_visited = {}
+    assert (len(available_letters) > 2)
+    letters_deck = sorted(available_letters)
+    for k in range(len(letters_deck), 2, -1):
+        for comb in combinations(letters_deck, k):
+            try:
+                already_visited[comb]
+            except KeyError:
+                already_visited[comb] = True
+                try:
+                    found_words.extend(anagrams[comb])
+                except KeyError:
+                    pass
+    return found_words
 
 
 if __name__ == '__main__':
@@ -37,4 +49,6 @@ if __name__ == '__main__':
         words_anagrams = create_anagram_dict()
         pickle.dump(words_anagrams, open(PICKLE_WORD_FILE, "wb"))
 
+    words = find_possible_words(words_anagrams, "plheouitrtobhfeghyuj")
+    print(words)
 
